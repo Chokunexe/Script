@@ -1,141 +1,198 @@
--- ตั้งค่าเริ่มต้น
-_G.AutoFarm = true  -- เปิด/ปิดระบบฟาร์มอัตโนมัติ
-_G.ESP = true  -- เปิด/ปิด ESP
-_G.BladeCount = 5  -- จำนวนใบมีดเริ่มต้น
-_G.FloatingHeight = 5  -- ความสูงที่ลอยเหนือไททัน
-_G.SlashAnimation = nil  -- กำหนดตัวแปรอนิเมชั่นโจมตีแบบ slash
-
-local HttpService = game:GetService("HttpService")
-local webhookUrl = "https://discord.com/api/webhooks/1264868020266729502/2dt31-01VCzhBDj-yD7mbDo-5lR_lwAxcDVh0O08H9Qbo2RfbKPhglsUIckeZo2LhOKD"
-
--- ฟังก์ชันสำหรับส่งข้อมูลไปยัง Webhook
-local function sendWebhook(message)
-    local data = {
-        content = message
-    }
-    local jsonData = HttpService:JSONEncode(data)
-
-    local success, err = pcall(function()
-        HttpService:PostAsync(webhookUrl, jsonData, Enum.HttpContentType.ApplicationJson)
-    end)
-
-    if not success then
-        warn("Error sending webhook: " .. err)
+function CheckQuest()
+    local Lv = game:GetService("Players").LocalPlayer.Data.Level.Value
+    if Lv >= 1 and Lv <= 9 then
+        Mon = "Bandit [Lv. 5]"
+        NameMon = "Bandit"
+        LvQuest = 1
+        NameQuest = "BanditQuest1"
+        CFrameMon = CFrame.new(1038.2711181640625, 24.537282943725586, 1550.2586669921875)
+        CFrameQuest = CFrame.new(1059.8109130859375, 16.362747192382812, 1549.0882568359375)
+    elseif Lv >= 10 and Lv <= 14 then
+        Mon = "Monkey [Lv. 14]"
+        NameMon = "Monkey"
+        LvQuest = 1
+        NameQuest = "JungleQuest"
+        CFrameMon = CFrame.new(-1443.7662353515625, 61.851966857910156, -47.555946350097656)
+        CFrameQuest = CFrame.new(-1599.8194580078125, 36.852149963378906, 153.0706024169922)
+    elseif Lv >= 15 and Lv <= 29 then
+        Mon = "Gorilla [Lv. 20]"
+        NameMon = "Gorilla"
+        LvQuest = 2
+        NameQuest = "JungleQuest"
+        CFrameMon = CFrame.new(-1443.7662353515625, 61.851966857910156, -47.555946350097656)
+        CFrameQuest = CFrame.new(-1599.8194580078125, 36.852149963378906, 153.0706024169922)
+    else
+        print("Level not within quest range.")
     end
 end
 
--- ฟังก์ชันสำหรับสร้าง ESP บนไททัน
-local function CreateESP(titan)
-    if titan:FindFirstChild("HumanoidRootPart") and _G.ESP then
-        -- สร้าง BillboardGUI สำหรับ ESP
-        if not titan.HumanoidRootPart:FindFirstChild("ESP") then
-            local esp = Instance.new("BillboardGui", titan.HumanoidRootPart)
-            esp.Name = "ESP"
-            esp.AlwaysOnTop = true
-            esp.Size = UDim2.new(2, 0, 2, 0)
-            esp.Adornee = titan.HumanoidRootPart
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/naypramx/Ui__Project/Script/XeNonUi", true))()
+library:CreateWatermark("NOOB HUB") -- Config แตกนะเดียวค่อยแก้รอเน็ตมาก่อน By MeowX#0001
+local CenterHubNo1 = library:CreateWindow("NOOB HUB | BLOX FRUIT", Enum.KeyCode.RightControl)
+local Tab = CenterHubNo1:CreateTab("Main")
+local AutoFarm = Tab:CreateSector("AutoFarm", "Left")
+AutoFarm:AddLabel("AutoFarm Lv")
 
-            -- สร้าง TextLabel สำหรับชื่อไททัน
-            local nameLabel = Instance.new("TextLabel", esp)
-            nameLabel.Text = "Titan"
-            nameLabel.Size = UDim2.new(1, 0, 1, 0)
-            nameLabel.TextColor3 = Color3.new(1, 0, 0)
-            nameLabel.BackgroundTransparency = 1
+Weapon = {}
+for _, v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
+    if v:IsA("Tool") then
+        table.insert(Weapon, v.Name)
+    end
+end
+
+local WE = AutoFarm:AddDropdown("Select Weapon", Weapon, "Select Weapon", false, function(t)
+    _G.SelectWeapon = t
+end)
+
+function Equip(ToolX)
+    local player = game:GetService("Players").LocalPlayer
+    if player.Backpack:FindFirstChild(ToolX) then
+        local tool = player.Backpack:FindFirstChild(ToolX)
+        player.Character.Humanoid:EquipTool(tool)
+    end
+end
+
+function click()
+    game:GetService('VirtualUser'):CaptureController()
+    game:GetService('VirtualUser'):Button1Down(Vector2.new(1280, 672))
+end
+
+function TP(P)
+    local Distance = (P.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+    local Speed = 300
+    local tweenService, tweenInfo = game:GetService("TweenService"), TweenInfo.new(Distance / Speed, Enum.EasingStyle.Linear)
+    local tween = tweenService:Create(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart, tweenInfo, { CFrame = P })
+    tween:Play()
+end
+
+AutoFarm:AddButton("ReSet Weapon", function()
+    table.clear(Weapon)
+    for _, v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
+        if v:IsA("Tool") then
+            WE:Add(v.Name)
         end
-    end
-end
-
--- ฟังก์ชันสำหรับล็อคที่ท้ายทอย
-local function LockOnTitan(titan)
-    return titan.HumanoidRootPart.Position + Vector3.new(0, _G.FloatingHeight, 0) -- ตำแหน่งที่ลอยเหนือไททัน
-end
-
--- ฟังก์ชันสำหรับโจมตีไททัน
-local function AttackTitan(character)
-    if not _G.SlashAnimation then
-        -- โหลดอนิเมชั่นโจมตีแบบ slash (กรุณาแทนที่ด้วย ID ของอนิเมชั่นที่คุณต้องการ)
-        local animation = Instance.new("Animation")
-        animation.AnimationId = "rbxassetid://YOUR_ANIMATION_ID_HERE"  -- ใส่ ID ของอนิเมชั่นที่ต้องการ
-        _G.SlashAnimation = character.Humanoid:LoadAnimation(animation)
-    end
-
-    if _G.SlashAnimation then
-        _G.SlashAnimation:Play()  -- เล่นอนิเมชั่นโจมตี
-        sendWebhook("โจมตีไททันแล้ว! จำนวนใบมีดที่เหลือ: " .. _G.BladeCount)  -- ส่งข้อความไปยัง Webhook
-    end
-end
-
--- ฟังก์ชันสำหรับตรวจสอบว่าไททันกระโดดหรือไม่
-local function IsTitanJumping(titan)
-    local humanoid = titan:FindFirstChildOfClass("Humanoid")
-    return humanoid and humanoid:GetState() == Enum.HumanoidStateType.Jumping
-end
-
--- ฟังก์ชันสำหรับฟาร์มไททัน
-local function AutoFarmTitan()
-    while _G.AutoFarm do
-        for _, titan in pairs(game.Workspace.Titans:GetChildren()) do
-            if titan:IsA("Model") and titan:FindFirstChild("HumanoidRootPart") then
-                -- สร้าง ESP ให้กับไททัน (ถ้ายังไม่มี)
-                CreateESP(titan)
-
-                -- เคลื่อนที่ไปที่ไททันเพื่อฟาร์ม
-                local player = game.Players.LocalPlayer
-                local char = player.Character
-                local hrp = char:FindFirstChild("HumanoidRootPart")
-
-                if hrp then
-                    -- ล็อคเป้าหมายที่ลอยเหนือหัวไททัน
-                    local targetPosition = LockOnTitan(titan)
-
-                    -- หากไททันกระโดด ให้เพิ่มความสูง
-                    if IsTitanJumping(titan) then
-                        targetPosition = targetPosition + Vector3.new(0, 5, 0)  -- เพิ่มความสูง 5
-                    end
-
-                    -- เคลื่อนย้ายผู้เล่นไปที่ตำแหน่งที่ล็อค
-                    hrp.CFrame = CFrame.new(targetPosition)
-
-                    -- เช็คจำนวนใบมีดก่อนโจมตี
-                    if _G.BladeCount > 0 then
-                        AttackTitan(char)  -- เรียกฟังก์ชันโจมตี
-                        _G.BladeCount = _G.BladeCount - 1  -- ลดจำนวนใบมีดหลังจากโจมตี
-                        print("ใบมีดที่เหลือ: " .. _G.BladeCount)
-                    else
-                        -- หากใบมีดหมด ให้เติมใบมีดและกลับมา
-                        print("เติมใบมีด...")
-                        refillBlades()  -- เรียกฟังก์ชันเติมใบมีด
-                        wait(1)  -- รอ 1 วินาทีก่อนกลับไปฟาร์มต่อ
-                        break  -- ออกจากลูป for เพื่อกลับไปเริ่มฟาร์มใหม่
-                    end
-                end
-
-                wait(1)  -- รอ 1 วินาทีก่อนฟาร์มตัวถัดไป
-            end
-        end
-        wait(2)  -- รอการเกิดใหม่ของไททัน
-    end
-end
-
--- ฟังก์ชันเติมใบมีด
-local function refillBlades()
-    wait(2)  -- สมมุติว่าใช้เวลาสองวินาทีในการเติมใบมีด
-    _G.BladeCount = 5  -- รีเซ็ตจำนวนใบมีดกลับเป็น 5
-    print("เติมใบมีดเรียบร้อยแล้ว")
-end
-
--- เริ่มฟาร์มไททัน
-AutoFarmTitan()
-
--- ปุ่มสำหรับเปิด/ปิดระบบฟาร์ม
-local UIS = game:GetService("UserInputService")
-UIS.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.F then
-        _G.AutoFarm = not _G.AutoFarm  -- เปิด/ปิดฟาร์ม
-        if _G.AutoFarm then
-            AutoFarmTitan()  -- เริ่มฟาร์มใหม่
-        end
-    elseif input.KeyCode == Enum.KeyCode.E then
-        _G.ESP = not _G.ESP  -- เปิด/ปิด ESP
     end
 end)
+
+AutoFarm:AddToggle("BringMob", false, function(t)
+    _G.BringMob = t
+end)
+
+AutoFarm:AddToggle("AutoFarm", false, function(t)
+    _G.AutoFarm = t
+end)
+
+local Stats = Tab:CreateSector("Stats", "Reft")
+Stats:AddLabel("Stats")
+Stats:AddToggle("Auto Melee", false, function(t)
+    _G.Melee = t
+    while _G.Melee do wait(.1)
+        pcall(function()
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Melee", Point)
+        end)
+    end
+end)
+
+Stats:AddToggle("Auto Defense", false, function(t)
+    _G.Defense = t
+    while _G.Defense do wait(.1)
+        pcall(function()
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Defense", Point)
+        end)
+    end
+end)
+
+Stats:AddToggle("Auto Sword", false, function(t)
+    _G.Sword = t
+    while _G.Sword do wait(.1)
+        pcall(function()
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Sword", Point)
+        end)
+    end
+end)
+
+Stats:AddToggle("Auto Gun", false, function(t)
+    _G.Gun = t
+    while _G.Gun do wait(.1)
+        pcall(function()
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Gun", Point)
+        end)
+    end
+end)
+
+Stats:AddToggle("Auto Blox Fruit", false, function(t)
+    _G.Fruit = t
+    while _G.Fruit do wait(.1)
+        pcall(function()
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Demon Fruit", Point)
+        end)
+    end
+end)
+
+Stats:AddSlider("Point", 1, 1, 100, 1, function(x)
+    Point = x
+end)
+
+spawn(function()
+    while wait() do
+        if _G.BringMob then
+            pcall(function()
+                CheckQuest()
+                for _, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                    for _, y in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                        if v.Name == Mon then
+                            if y.Name == Mon then
+                                v.HumanoidRootPart.CFrame = y.HumanoidRootPart.CFrame
+                                v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
+                                y.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
+                                v.HumanoidRootPart.Transparency = 1
+                                v.HumanoidRootPart.CanCollide = false
+                                y.HumanoidRootPart.CanCollide = false
+                                v.Humanoid.WalkSpeed = 0
+                                y.Humanoid.WalkSpeed = 0
+                                v.Humanoid.JumpPower = 0
+                                y.Humanoid.JumpPower = 0
+                                if sethiddenproperty then
+                                    sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+spawn(function()
+    while wait() do
+        if _G.AutoFarm then
+            pcall(function()
+                CheckQuest()
+                local playerGui = game:GetService("Players").LocalPlayer.PlayerGui.Main
+                if not playerGui.Quest.Visible then
+                    TP(CFrameQuest)
+                    if (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 5 then
+                        wait(.1)
+                        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("StartQuest", NameQuest, LvQuest)
+                    end
+                elseif playerGui.Quest.Visible then
+                    if string.find(playerGui.Quest.Container.QuestTitle.Title.Text, NameMon) then
+                        for _, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                            if v.Name == Mon and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") then
+                                if v.Humanoid.Health > 0 then
+                                    repeat wait()
+                                        click()
+                                        Equip(_G.SelectWeapon)
+                                        local HealthMin = v.Humanoid.MaxHealth * 0.9
+                                        local Magma = (v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                                        if Magma <= 230 then
+                                            if v.Humanoid.Health > HealthMin then
+                                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0, 0, 14)
+                                            else
+                                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0, 15, 0)
+                                            end
+                                        end
+
+                                        if v.Humanoid.Health > HealthMin then
+                                            local Distance = (v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.H
