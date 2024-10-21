@@ -21,8 +21,6 @@ function CheckQuest()
         NameQuest = "JungleQuest"
         CFrameMon = CFrame.new(-1443.7662353515625, 61.851966857910156, -47.555946350097656)
         CFrameQuest = CFrame.new(-1599.8194580078125, 36.852149963378906, 153.0706024169922)
-    else
-        print("Level not within quest range.")
     end
 end
 
@@ -41,7 +39,7 @@ for _, v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren())
 end
 
 local WE = AutoFarm:AddDropdown("Select Weapon", Weapon, "Select Weapon", false, function(t)
-    _G.SelectWeapon = t
+    _G.SelectWeapon = true
 end)
 
 function Equip(ToolX)
@@ -75,17 +73,17 @@ AutoFarm:AddButton("ReSet Weapon", function()
 end)
 
 AutoFarm:AddToggle("BringMob", false, function(t)
-    _G.BringMob = t
+    _G.BringMob = true
 end)
 
 AutoFarm:AddToggle("AutoFarm", false, function(t)
-    _G.AutoFarm = t
+    _G.AutoFarm = true
 end)
 
 local Stats = Tab:CreateSector("Stats", "Reft")
 Stats:AddLabel("Stats")
 Stats:AddToggle("Auto Melee", false, function(t)
-    _G.Melee = t
+    _G.Melee = true
     while _G.Melee do wait(.1)
         pcall(function()
             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Melee", Point)
@@ -94,7 +92,7 @@ Stats:AddToggle("Auto Melee", false, function(t)
 end)
 
 Stats:AddToggle("Auto Defense", false, function(t)
-    _G.Defense = t
+    _G.Defense = true
     while _G.Defense do wait(.1)
         pcall(function()
             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Defense", Point)
@@ -103,7 +101,7 @@ Stats:AddToggle("Auto Defense", false, function(t)
 end)
 
 Stats:AddToggle("Auto Sword", false, function(t)
-    _G.Sword = t
+    _G.Sword = true
     while _G.Sword do wait(.1)
         pcall(function()
             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Sword", Point)
@@ -112,7 +110,7 @@ Stats:AddToggle("Auto Sword", false, function(t)
 end)
 
 Stats:AddToggle("Auto Gun", false, function(t)
-    _G.Gun = t
+    _G.Gun = true
     while _G.Gun do wait(.1)
         pcall(function()
             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Gun", Point)
@@ -121,7 +119,7 @@ Stats:AddToggle("Auto Gun", false, function(t)
 end)
 
 Stats:AddToggle("Auto Blox Fruit", false, function(t)
-    _G.Fruit = t
+    _G.Fruit = true
     while _G.Fruit do wait(.1)
         pcall(function()
             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Demon Fruit", Point)
