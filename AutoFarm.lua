@@ -3,6 +3,8 @@ local Char = Player.Character or Player.CharacterAdded:Wait()
 local CameraShaker = require(game.ReplicatedStorage.Util.CameraShaker)
 local CombatFrameworkR = require(game:GetService("Players").LocalPlayer.PlayerScripts.CombatFramework)
 
+_G.AutoFarm = true
+
 local function ChackQ()
     local Lv = Player:FindFirstChild("Data") and Player.Data:FindFirstChild("Level")
     if Lv and Lv.Value then
