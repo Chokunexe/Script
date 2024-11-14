@@ -2,7 +2,7 @@ local Player = game:GetService("Players").LocalPlayer
 local Char = Player.Character or Player.CharacterAdded:Wait()
 
 
-_G.AutoFarm = true
+_G.AutoFarm = true --ออโต้
 _G.bringmob = true
 
 local function GetQuests(N, NB)
