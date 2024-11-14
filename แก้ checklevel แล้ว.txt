@@ -1,9 +1,6 @@
 local Player = game:GetService("Players").LocalPlayer
 local Char = Player.Character or Player.CharacterAdded:Wait()
-local CombatFramework = require(Player.PlayerScripts.CombatFramework)
-local Camera = require(game.ReplicatedStorage.Util.CameraShaker)
 
-Camera:Stop()
 
 _G.AutoFarm = true
 _G.bringmob = true
@@ -78,7 +75,7 @@ local function TW(...)
     pcall(function()
         if not _G.StopTween and Char and Char:FindFirstChild("HumanoidRootPart") then
             local Distance = (CFrame[1].Position - Char.HumanoidRootPart.Position).Magnitude
-            Tween = game:GetService("TweenService"):Create(Char.HumanoidRootPart, TweenInfo.new(Distance/100, Enum.EasingStyle.Cubic), {CFrame = CFrame[1]})
+            Tween = game:GetService("TweenService"):Create(Char.HumanoidRootPart, TweenInfo.new(Distance/300, Enum.EasingStyle.Cubic), {CFrame = CFrame[1]})
             if _G.StopTween then 
                 Tween:Cancel()
             elseif Char.Humanoid.Health > 0 then 
@@ -103,15 +100,75 @@ local function ClearQ()
     end
 end
 
-coroutine.wrap(function()
-    game:GetService("RunService").Stepped:Connect(function()
-        if getupvalues(CombatFramework)[2]['activeController'].timeToNextAttack then
-            getupvalues(CombatFramework)[2]['activeController'].timeToNextAttack = 300
-            getupvalues(CombatFramework)[2]['activeController'].hitboxMagnitude = 25
-            getupvalues(CombatFramework)[2]['activeController']:attack()
+
+getgenv().FastAttack = true
+local plr = game.Players.LocalPlayer
+
+local CbFw = debug.getupvalues(require(plr.PlayerScripts.CombatFramework))
+local CbFw2 = CbFw[2]
+
+function GetCurrentBlade()
+    local y = CbFw2.activeController
+    local ret = y.blades[1]
+    if not ret then return end
+    while ret.Parent ~= game.Players.LocalPlayer.Character do 
+        ret = ret.Parent 
+    end
+    return ret
+end
+
+spawn(function()
+    while wait(0.4) do
+        if getgenv().FastAttack then
+            pcall(function()
+                game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("hit", bladehit, i, "")
+            end)
+        end
+    end
+end)
+
+local CameraShaker = require(game.ReplicatedStorage.Util.CameraShaker)
+local CombatFrameworkR = require(game:GetService("Players").LocalPlayer.PlayerScripts.CombatFramework)
+local y = debug.getupvalues(CombatFrameworkR)[2]
+
+spawn(function()
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if getgenv().FastAttack then
+            if typeof(y) == "table" then
+                pcall(function()
+                    CameraShaker:Stop()
+                    y.activeController.timeToNextAttack = (math.huge^math.huge^math.huge)
+                    y.activeController.timeToNextAttack = 0
+                    y.activeController.hitboxMagnitude = 2048
+                    y.activeController.active = false
+                    y.activeController.timeToNextBlock = 0
+                    y.activeController.focusStart = 0
+                    y.activeController.increment = 1
+                    y.activeController.blocking = false
+                    y.activeController.attacking = false
+                    y.activeController.humanoid.AutoRotate = true
+                    GetCurrentBlade()
+                    local ret = GetCurrentBlade()
+                    if ret then
+                        ret.activeController.timeToNextAttack = (math.huge^math.huge^math.huge)
+                        ret.activeController.timeToNextAttack = 0
+                        ret.activeController.hitboxMagnitude = 2048
+                        ret.activeController.active = false
+                        ret.activeController.timeToNextBlock = 0
+                        ret.activeController.focusStart = 0
+                        ret.activeController.increment = 1
+                        ret.activeController.blocking = false
+                        ret.activeController.attacking = false
+                        ret.activeController.humanoid.AutoRotate = true
+                        game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("weaponChange", tostring(GetCurrentBlade()))
+                        game.ReplicatedStorage.Remotes.Validator:FireServer(math.floor(u12 / 1099511627776 * 16777215), u10)
+                    end
+                end)
+            end
         end
     end)
-end)()
+end)
+
 
 spawn(function()
     while wait() do
