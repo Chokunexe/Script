@@ -18,7 +18,7 @@ local StopCamera = require(game.ReplicatedStorage.Util.CameraShaker)StopCamera:S
                                      v.activeController.increment = 4
                                      v.activeController.blocking = false   
                                      v.activeController.hitboxMagnitude = 150
-    		                         v.activeController.humanoid.AutoRotate = true
+    		                     v.activeController.humanoid.AutoRotate = true
     	                      	     v.activeController.focusStart = 0
     	                      	     v.activeController.currentAttackTrack = 0
                                      sethiddenproperty(game:GetService("Players").LocalPlayer, "SimulationRaxNerous", math.huge)
@@ -30,14 +30,16 @@ local StopCamera = require(game.ReplicatedStorage.Util.CameraShaker)StopCamera:S
             end
         end
     end
-end)();
+end)()
+
 
 spawn(function()
     game:GetService("RunService").RenderStepped:Connect(function()
         if getgenv().Config['ClickAttack'] then
              pcall(function()
                 game:GetService'VirtualUser':CaptureController()
-			    game:GetService'VirtualUser':Button1Down(Vector2.new(0,1,0,1))
+						
+			game:GetService'VirtualUser':Button1Down(Vector2.new(0,1,0,1))
             end)
         end
     end)
