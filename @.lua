@@ -29,7 +29,6 @@ local sethiddenproperty = sethiddenproperty or (function(...) return ... end)
 local setupvalue = setupvalue or (debug and debug.setupvalue)
 local getupvalue = getupvalue or (debug and debug.getupvalue)
 
-_G.AutoFarm = true
 
 local GetQuests = function(NameQuest,LevelQuest)
     local args = {
@@ -201,6 +200,7 @@ spawn(function()
     end)
 end)
 
+_G.AutoFarm = true
 
 spawn(function()
     while wait() do
