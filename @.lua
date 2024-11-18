@@ -29,6 +29,7 @@ local sethiddenproperty = sethiddenproperty or (function(...) return ... end)
 local setupvalue = setupvalue or (debug and debug.setupvalue)
 local getupvalue = getupvalue or (debug and debug.getupvalue)
 
+_G.AutoFarm = true
 
 local function GetQuests(NameQuest, LvQuest)
     local args = {
