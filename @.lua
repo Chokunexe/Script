@@ -31,11 +31,11 @@ local getupvalue = getupvalue or (debug and debug.getupvalue)
 
 _G.AutoFarm = true
 
-local function GetQuests(NameQuest, LvQuest)
+local GetQuests = function(NameQuest,LevelQuest)
     local args = {
         [1] = "StartQuest",
         [2] = NameQuest or "BanditQuest1",
-        [3] = LvQuest or 1
+        [3] = LevelQuest or 1
     }
     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("CommF_"):InvokeServer(unpack(args))    
 end
