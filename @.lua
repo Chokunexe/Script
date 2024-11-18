@@ -34,8 +34,8 @@ _G.AutoFarm = true
 local function GetQuests(NameQuest, LvQuest)
     local args = {
         [1] = "StartQuest",
-        [2] = NameQuest,
-        [3] = LvQuest
+        [2] = NameQuest or "BanditQuest1",
+        [3] = LvQuest or 1
     }
     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("CommF_"):InvokeServer(unpack(args))    
 end
