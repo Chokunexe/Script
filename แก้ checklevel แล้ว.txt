@@ -13,7 +13,7 @@ local function GetQuests(N, NB)
     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("CommF_"):InvokeServer(unpack(args))    
 end
 
-local function ChackQ()
+local function CheckQuest()
     local Lv = Player:FindFirstChild("Data") and Player.Data:FindFirstChild("Level")
     if Lv and Lv.Value then
         if Lv.Value >= 1 and Lv.Value <= 9 then
@@ -74,7 +74,7 @@ local function TW(...)
     pcall(function()
         if not _G.StopTween and Char and Char:FindFirstChild("HumanoidRootPart") then
             local Distance = (CFrame[1].Position - Char.HumanoidRootPart.Position).Magnitude
-            Tween = game:GetService("TweenService"):Create(Char.HumanoidRootPart, TweenInfo.new(Distance/300, Enum.EasingStyle.Cubic), {CFrame = CFrame[1]})
+            Tween = game:GetService("TweenService"):Create(Char.HumanoidRootPart, TweenInfo.new(Distance/285, Enum.EasingStyle.Cubic), {CFrame = CFrame[1]})
             if _G.StopTween then 
                 Tween:Cancel()
             elseif Char.Humanoid.Health > 0 then 
@@ -93,7 +93,7 @@ end
 
 local function ClearQ()
     local currentQuest = Player.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text
-    local questData = ChackQ()
+    local questData = CheckQuest()
     if questData and not string.find(currentQuest, questData.Mon) then
         game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AbandonQuest")
     end
@@ -175,7 +175,7 @@ spawn(function()
             if _G.AutoFarm then
                 local UIQ = Player.PlayerGui.Main.Quest
                 ClearQ()
-                local questData = ChackQ()
+                local questData = CheckQuest()
                 if questData then
                     if not UIQ.Visible or UIQ.Visible == false then
                         TW(questData.CFrameQ)
@@ -207,15 +207,16 @@ spawn(function()
     end
 end)
 
+_G.BringMob = true
 spawn(function()
     while wait() do
         if _G.BringMob then
             pcall(function()
-                CheckQuest()
-                for _, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-                    for _, y in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-                        if v.Name == Mon then
-                            if y.Name == Mon then
+                local questData = CheckQuest()
+                for i, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                    for x, y in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                        if v.Name == questData.Mon then
+                            if y.Name == questData.Mon then
                                 v.HumanoidRootPart.CFrame = y.HumanoidRootPart.CFrame
                                 v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
                                 y.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
